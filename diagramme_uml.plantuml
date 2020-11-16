@@ -1,0 +1,92 @@
+@startuml
+
+class Vehicule {
+  immatriculation : string {key}
+  marque: string
+  modele : string
+  annee_prod : int
+  proprietaire : Utilisateur
+}
+
+class Voiture
+
+class Moto {
+  cylindre : int
+}
+
+class Camion {
+  transport_vehicule : bool
+  capacitee : int
+}
+
+class Special {
+  type : string 
+}
+
+class Station_base {
+  identifiant : int {key}
+  position : Position
+  commune : Commune
+}
+
+class Noeud
+
+class Capteur {
+  modele : string
+  num_serie {key}
+}
+
+class Evenement {
+  horodatage : Date
+}
+
+class Accident {
+  gravite : string
+  nb : int
+  type_vehicule
+}
+
+class Alerte_meteo {
+  temps : string
+  temperature : float
+}
+
+class Travaux
+
+class Controle_routier
+  
+class Position <<dataType>> {
+  latitude : float
+  longitude : float
+}
+
+class Commune <<dataType>> {
+  nom :string
+  CP : int
+}
+
+
+
+class Utilisateur <<dataType>> {
+  nom : string
+  prenom : string
+  num_secu_sociale : string {key}
+}
+
+Station_base "1"--"*" Vehicule : communique
+Noeud <|- Station_base
+Noeud <|-- Vehicule 
+Vehicule <|-- Voiture
+Vehicule <|-- Moto
+Vehicule <|-- Camion
+Vehicule <|-- Special
+Evenement <|-- Accident
+Evenement <|-- Alerte_meteo
+Evenement <|-- Travaux
+Evenement <|-- Controle_routier
+Capteur "1..N"--* Station_base
+Capteur "0..N"-* Vehicule 
+Capteur "*"--"*" Evenement : detecte
+
+
+@enduml

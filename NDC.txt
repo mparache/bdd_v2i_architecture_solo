@@ -1,0 +1,38 @@
+# Note De Clarification
+
+## Liste des objets présents dans la base et leurs propriétés
+
+Dans la base de données, il y a des noeuds qui sont soit des véhicules, soit des stations de base:
+* une station de base possède un identifiant qui lui est propre
+* un véhicule a une immatriculation (qui l'identifie), une marque, un modèle et une année de production. 
+
+Il y a plusieurs types de véhicules:
+* les voitures
+* les motos qui possèdent une information sur la capacité du moteur
+* les camions possèdent une information booléenne sur leur capacité à transporter d'autre véhicules (vrai s'il peut en transporter, faux sinon), ainsi qu'un entier représentant le nombre de véhicule pouvant être transporter.
+* les véhicules spéciaux qui ont un type permettant de caractériser le véhicule (pompiers, police, SAMU, etc.)
+
+Une station de base est ratachée à une commune.
+* une commune possède un nom et un code postal.
+
+Une station de base possède une position géographique:
+* une position est composée d'une latitude et d'une longitude.
+
+Tout noeud peut être équipé d'un ou plusieurs capteurs, mais une station de base en a au moins 1.
+* un capteur a un modèle et un numéro de série qui lui est propre.
+
+Les capteurs détectent des évenements.
+* un évenement a un horodatage.
+
+Il y a plusieurs types d'évenement détectables:
+* un contrôle routier.
+* un accident caractérisé par une gravité, le nombre de véhicules intervenu dans l'accident, et les types de ces véhicules.
+* une alerte météo caractérisée par un temps et une température.
+* des travaux.
+
+Tout évenement a lieu dans une commune.
+
+## Hypothèses faites sur le sujet
+
+* A une position géographique est associée une unique station de base.
+* Il y a une seule station de base par commune.

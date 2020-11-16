@@ -1,0 +1,178 @@
+Normalisation : 
+Forme Normale 1NF :
+Ici tout les attributs sont atomiques, donc on est en 1NF.
+
+Forme Normale 2NF :
+Toutes les clés sont atomiques , donc on est en 2NF.
+
+Forme Normale 3NF :
+D'après les tables, on peut voir qu'aucun attribut non clé détermine un autre attribut non clé. La plupart des attributs non clé sont déterminés par la clé primaire ou alors par une clé candidate de la table en question. Donc on est en 3NF.
+
+
+
+
+
+Heritage par reference pour Evenement:
+
+Evenenement (
+  #horodatage : date
+)
+ 
+ -> un seul attribut clé donc 3NF
+
+Accident (
+  #horodatage => Evenement.horodatage,
+  gravite : text,
+  nb : int,
+  type_vehicule : JSON 
+)
+
+ -> les attributs et la clé sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+type_vehicule est de la forme [type_vehicule1, type_vehicule2, ...]
+
+Contrainte: (type_vehicule IS NOT NULL)
+
+Alerte_meteo (
+  #horodatage => Evenement.horodatage,
+  temps : text,
+  temperature : float
+)
+
+ -> les attributs et la clé sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+Travaux (
+  #horodatage => Evenement.horodatage
+)
+
+ -> un seul attribut clé donc 3NF
+
+Controle_routier (
+  #horodatage => Evenement.horodatage
+)
+
+ -> un seul attribut clé donc 3NF
+
+
+Contraintes complexes pour l'héritage;
+- Intersection (Projection(Accident,horodatage), Projection(Alerte_meteo,horodatage), Projection(Travaux,horodatage), Projection(Controle_routier,horodatage)) = {}
+- Projection(Evenement,horodatage) = Union (Projection(Accident,horodatage), Projection(Alerte_meteo,horodatage), Projection(Travaux,horodatage), Projection(Controle_routier,horodatage))
+
+
+
+
+
+Heritage par reference pour Vehicule:
+
+Vehicule (
+  #immatriculation : text,
+  marque : text,
+  modele : text,
+  annee_prod : int,
+  proprietaire : {nom : string, prenom : string, num_secu_sociale : string},
+  #station => Station_base.identifiant
+)
+
+ -> les attributs et les clés sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+Voiture (
+  #immatriculation : text
+)
+
+ -> un seul attribut clé donc 3NF
+
+Moto (
+  #immatriculation : text,
+  cylindre : int
+)
+
+ -> les attributs et la clé sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+Camion (
+  #immatriculation : text,
+  transport_vehicule : bool,
+  capacite : int,
+)
+
+ -> les attributs et la clé sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+Contrainte : (transport_vehicule IS NOT NULL)
+
+Special (
+  #immatriculation : text,
+  type : text
+)
+
+ -> les attributs et la clé sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+
+Contraintes complexes pour l'héritage;
+- Intersection (Projection(Voiture,immatriculation), Projection(Moto,immatriculation), Projection(Camion,immatriculation), Projection(Special,immatriculation)) = {}
+- Projection(Vehicule,immatriculation) = Union (Projection(Voiture,immatriculation), Projection(Moto,immatriculation), Projection(Camion,immatriculation), Projection(Special,immatriculation))
+
+
+
+
+
+
+Station_base (
+  #identifiant : int,
+  position : {latitude : float, longitude : float},
+  commune : {nom : string, CP : int}
+)
+
+ -> les attributs et la clé sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+Contrainte : (position IS NOT NULL AND commune IS NOT NULL)
+
+
+
+
+
+Capteur (
+  #num_serie : int,
+  modele : text,
+  #immatriculation => Vehicule.immatriculation,
+  #identifiant => Station_base.identifiant
+)
+
+ -> les attributs et les clés sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+Contrainte: ( #immatriculation IS NULL AND #identifiant NOT NULL ) OR ( #immatriculation NOT NULL AND #identifiant IS NULL )
+
+Detecte (
+  #capteur => Capteur.num_serie,
+  #evenement => Evenement.horodatage
+)
+
+ -> les attributs et les clés sont atomiques et la clé ne détermine aucun attribut donc 3NF
+
+  
+
+
+
+
+
+Vues :
+
+Lister tous les véhicules dans une région : 
+On sélectionne l'immatriculation, la marque et le modèle en cherchant dans les tables Vehicule et Station_base lorsque l'attribut station de Vehicule et le même que l'attribut identifiant de Station_base et lorsque l'attribut JSON commune de Station_base a un nom égal à la ville où on fait la recherche.
+
+
+Lister toutes les communications liées à une station de base :
+On sélectionne l'immatriculation, la marque et le modèle en cherchant dans la table Vehicule lorsque l'attribut station de Vehicule est le même que l'identifiant de la Station_base dont on cherche les communications.
+
+
+Trouver le véhicule le plus proche d'un certain type, par exemple, un camion de pompiers, véhicule SAMU, etc. ou un certain modèle : toutes les Citroën C5, ... : 
+ - Pour un véhicule spécial:
+	On sélectionne l'immatriculation, la marque et le modèle en cherchant dans les tables Vehicule et Special lorsque les attributs immatriculation de Vehicule et de Special sont les mêmes et que l'attribut type de Special est celui recherché.
+ - Pour un autre type de véhicule lorsqu'on cherche un modèle particulier:
+	On sélectionne l'immatriculation, la marque et le modèle en cherchant dans la table Vehicule lorsque les attributs marque et modele de Vehicule sont ceux recherchés.
+
+
+Gestion des droits :
+
+On donne aux administrateurs tous les droits sur la base de données.
+On crée le rôle d'utilisateur qui peut enregistrer son véhicule (donc en le laissant INSERT dans les tables Vehicule, Moto, Voiture, Camion, Special).
+
+
